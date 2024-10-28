@@ -29,15 +29,15 @@ import { useEffect, useState } from "react";
 
 const Store = () => {
   const NEXON_API = new NexonAPI();
-  const [params, setParams] = useState<IAuctionRequestParams>();
+  const [params, setParams] = useState<IAuctionRequestParams>({});
 
   const [loading, setLoading] = useState(false);
   // Fillter
   const [optionFlag, setOptionFlag] = useState(false);
 
-  const [auctionData, setAuctionData] = useState<Item[]>();
+  const [auctionData, setAuctionData] = useState<Item[]>([]);
   // Pagination
-  const [pagenationAuctionData, setPagenationAuctionData] = useState<Item[]>();
+  const [pagenationAuctionData, setPagenationAuctionData] = useState<Item[]>([]);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
@@ -147,12 +147,22 @@ const Store = () => {
    */
   const handleOptionFlag = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
-    if (value === 'on') {
+    if (value === "on") {
       setOptionFlag(true);
     } else {
       setOptionFlag(false);
     }
   };
+
+  /**
+   * 
+   */
+  const handleReset = () => {
+    setParams({})
+    setAuctionData([])
+    setPagenationAuctionData([])
+    setPage(1)
+  }
 
   return (
     <Flex
@@ -170,7 +180,7 @@ const Store = () => {
       <Flex direction="column" gap={4} width="100%">
         <Alert status="info" borderRadius={8}>
           <AlertIcon />
-          <Text>각종 필터가 추가 될 예정..</Text>
+          <Text>카테고리와 검색어 중 우선 적용된 사항 한 가지만 검색에 적용됩니다!</Text>
         </Alert>
         <Card>
           <CardBody borderWidth={1} borderRadius={8}>
@@ -190,20 +200,30 @@ const Store = () => {
                   variant="filled"
                   name="item_name"
                   placeholder="검색"
+                  defaultValue={params.item_name}
                   onChange={handleInputChange}
                 />
               </Box>
-              <Button
-                width={200}
-                colorScheme="green"
-                onClick={() => handleAuctionSearch()}
-              >
-                검색
-              </Button>
+              <Flex gap={4}>
+                <Button
+                  width={150}
+                  colorScheme="green"
+                  onClick={() => handleAuctionSearch()}
+                >
+                  검색
+                </Button>
+                <Button
+                  width={100}
+                  colorScheme="gray"
+                  onClick={() => handleReset()}
+                >
+                  초기화
+                </Button>
+              </Flex>
             </Flex>
           </CardBody>
         </Card>
-        <Card>
+        {/* <Card>
           <CardBody borderWidth={1} borderRadius={8}>
             <Flex justifyContent="space-between" alignItems="center" gap={4}>
               <Checkbox defaultChecked={optionFlag} onChange={handleOptionFlag}>
@@ -236,7 +256,7 @@ const Store = () => {
               </InputGroup>
             </Flex>
           </CardBody>
-        </Card>
+        </Card> */}
         <Flex gap={4}>
           <Card flex={2}>
             <CardBody borderWidth={1} borderRadius={8}>
@@ -245,7 +265,7 @@ const Store = () => {
           </Card>
           <Card flex={6}>
             <CardBody padding="10px 20px" borderWidth={1} borderRadius={8}>
-              {pagenationAuctionData && (
+              {pagenationAuctionData.length > 0 ? (
                 <>
                   <Pagination
                     page={page}
@@ -268,6 +288,10 @@ const Store = () => {
                     onPageChange={handlePageChange}
                   />
                 </>
+              ): (
+                <Flex justifyContent="center" align="center" height="100%">
+                  조회된 내용이 없습니다!
+                </Flex>
               )}
             </CardBody>
           </Card>
