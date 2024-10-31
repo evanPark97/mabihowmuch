@@ -17,7 +17,7 @@ const Header = () => {
           <Text fontSize={24} fontWeight={600} _hover={{
             textDecoration: "underline"
           }}>
-            지금 얼맙? (Beta 1.0)
+            지금 얼맙? (Beta 1.1)
           </Text>
         </Link>
         <Flex gap={2}>

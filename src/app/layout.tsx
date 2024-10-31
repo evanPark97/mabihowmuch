@@ -15,13 +15,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="kr">
-      <header>
+      <head>
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8613704714656621"
           crossOrigin="anonymous"
         ></script>
-      </header>
+      </head>
       <body>
         <ChakraProvider>
           <Header />
