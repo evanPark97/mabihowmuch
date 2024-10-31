@@ -23,7 +23,7 @@ export default function Home() {
         <Card width="xl" marginTop={8}>
           <CardBody>
             <Flex direction="column" gap={4}>
-              <Button colorScheme="green" onClick={() => route.push("store")}>
+              <Button colorScheme="green" onClick={() => alert("페이지 준비중입니다!")}>
                 NPC 상점 검색
               </Button>
               <Button colorScheme="green" onClick={() => route.push("auction")}>
