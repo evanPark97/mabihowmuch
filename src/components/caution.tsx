@@ -5,7 +5,7 @@ const Caution = () => {
   return (
     <Box width="100%">
       <Alert status="info" title="확인사항!">
-        <List.Root>
+        <List.Root fontSize={{ smDown: 'xs', sm: 'sm' }}>
           <List.Item>
             마비노기의 게임 데이터는 평균 10분 후 확인 가능합니다.
           </List.Item>

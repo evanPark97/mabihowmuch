@@ -61,16 +61,25 @@ export const AuctionItem = ({
   );
 
   return (
-    <Skeleton loading={loading}>
+    <Skeleton loading={loading} position="relative">
       {!optionFlag && (
         <DialogRoot
-          size="xl"
-          motionPreset="slide-in-bottom"
           lazyMount
-          preventScroll={false}
           open={openDialog}
+          size={{ mdDown: "md", md: "lg" }}
+          motionPreset="slide-in-bottom"
+          scrollBehavior="inside"
         >
-          <DialogContent position="absolute" zIndex={100}>
+          <DialogContent
+            position="fixed"
+            zIndex={100}
+            width='90%'
+            left={{ smDown: 0, smToMd: 0 }}
+            right={{ smDown: 0, smToMd: 0 }}
+            top={{ mdDown: 0, md: 0 }}
+            bottom={{ mdDown: 0, md: 0 }}
+            padding={1}
+          >
             <DialogHeader>
               <DialogTitle>{item.item_display_name}</DialogTitle>
             </DialogHeader>
@@ -96,25 +105,48 @@ export const AuctionItem = ({
       >
         <CardBody borderWidth={1} borderRadius={8}>
           <Box>
-            <Flex justifyContent="space-between" alignItems="flex-end">
-              <Flex gap={2} alignItems="center" position="relative">
-                <Text fontSize={20} fontWeight={600}>
-                  {item.item_display_name}
+            <Text fontSize={12}>
+              만료일: {new Date(item.date_auction_expire).toLocaleString()}
+            </Text>
+            <Flex
+              justifyContent="space-between"
+              alignItems={{ mdDown: "flex-start", md: "flex-end" }}
+              flexDirection={{ mdDown: "column", md: "row" }}
+            >
+              <Flex
+                gap={2}
+                alignItems={{ mdDown: "flex-start", md: "center" }}
+                flexDirection={{ mdDown: "column", md: "row" }}
+                width="100%"
+              >
+                <Text fontSize={{ smDown: "sm", sm: "md" }} fontWeight={600}>
+                  {item.item_display_name}{" "}
+                  {item.item_count > 1 && `(${item.item_count}개)`}
                 </Text>
                 {!optionFlag && (
                   <Button
                     variant="outline"
                     colorScheme="green"
-                    size="sm"
+                    size={{ smDown: "xs", sm: "sm" }}
                     onClick={() => setOpenDialog(true)}
                   >
                     옵션 보기
                   </Button>
                 )}
               </Flex>
-              <Text fontSize={18} fontWeight={600}>
-                {item.auction_price_per_unit.toLocaleString()} 골드
-              </Text>
+              <Flex flexDirection="column" alignItems="flex-end" width="100%">
+                {item.item_count > 1 && (
+                  <Text fontSize={{ smDown: "xs", sm: "sm" }}>
+                    개당 {item.auction_price_per_unit.toLocaleString()} 골드
+                  </Text>
+                )}
+                <Text fontSize={{ smDown: "sm", sm: "md" }} fontWeight={600}>
+                  {(
+                    item.auction_price_per_unit * item.item_count
+                  ).toLocaleString()}{" "}
+                  골드
+                </Text>
+              </Flex>
             </Flex>
             {optionFlag && (
               <Flex gap={4} marginTop={2}>

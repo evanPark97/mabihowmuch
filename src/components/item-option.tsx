@@ -50,6 +50,10 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
       );
 
     case "특별 개조":
+    case "품질":
+    case "토템 효과":
+    case "토템 추가 옵션":
+    case "토템 강화 제한":
       return (
         <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_sub_type}</Text>
@@ -68,6 +72,7 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
       );
 
     case "세트 효과":
+    case "사용 효과":
       return (
         <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
@@ -75,6 +80,8 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
         </Flex>
       );
     case "남은 전용 해제 가능 횟수":
+    case "남은 사용 횟수":
+    case "남은 거래 횟수":
       return (
         <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
@@ -82,6 +89,7 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
       );
 
     case "아이템 색상":
+    case "색상":
       return (
         <Flex gap={2} alignItems="center" key={uuidv4()}>
           <Box
@@ -152,6 +160,20 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
         </Flex>
       );
 
+    case "내구도":
+      return (
+        <Flex gap={2} key={uuidv4()}>
+          <Text>{option.option_value}</Text>
+        </Flex>
+      );
+
+    case "인챈트 종류":
+      return (
+        <Flex gap={2} key={uuidv4()}>
+          <Text>{option.option_value}</Text>
+        </Flex>
+      );
+
     default:
       break;
   }
@@ -206,6 +228,7 @@ export const OptionRenderer = ({
           break;
 
         case "특별 개조":
+        case "품질":
           layoutMap.special = (
             <Flex gap={2} key="special">
               <Text fontWeight={600}>{optionType}</Text>
@@ -224,6 +247,7 @@ export const OptionRenderer = ({
           break;
 
         case "세트 효과":
+        case "사용 효과":
           layoutMap.set = (
             <Flex key="set" flexDirection="column">
               <Text fontWeight={600}>{optionType}</Text>
@@ -233,6 +257,8 @@ export const OptionRenderer = ({
           break;
 
         case "남은 전용 해제 가능 횟수":
+        case "남은 사용 횟수":
+        case "남은 거래 횟수":
           layoutMap.belonging = (
             <Flex gap={2} key="belonging">
               <Text fontWeight={600}>{optionType}</Text>
@@ -242,9 +268,12 @@ export const OptionRenderer = ({
           break;
 
         case "아이템 색상":
+        case "색상":
           layoutMap.color = (
             <Box gap={2} key="color">
-              <Text fontWeight={600} marginBottom={2}>{optionType}</Text>
+              <Text fontWeight={600} marginBottom={2}>
+                {optionType}
+              </Text>
               <Flex gap={2} flexDirection="column">
                 {option.map((_option) => OptionValueRenderer(_option))}
               </Flex>
@@ -303,6 +332,50 @@ export const OptionRenderer = ({
           );
           break;
 
+        case "내구도":
+          layoutMap.durability = (
+            <Flex gap={2} key="durability">
+              <Text fontWeight={600}>{optionType}</Text>
+              <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
+            </Flex>
+          );
+          break;
+
+        case "인챈트 종류":
+          layoutMap.inchant = (
+            <Flex gap={2} key="options">
+              <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
+            </Flex>
+          );
+          break;
+
+        case "토템 효과":
+          layoutMap.totemEffect = (
+            <Flex gap={2} key="totem">
+              <Text fontWeight={600}>{optionType}</Text>
+              <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
+            </Flex>
+          );
+          break;
+        case "토템 추가 옵션":
+          layoutMap.totemOption = (
+            <Flex gap={2} key="totem">
+              <Text fontWeight={600}>{optionType}</Text>
+              <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
+            </Flex>
+          );
+          break;
+        case "토템 강화 제한":
+          layoutMap.totemLimit = (
+            <Flex gap={2} key="totem">
+              <Text fontSize={{ mdDown: "sm", md: "md" }} fontWeight={600}>
+                {optionType}
+              </Text>
+              <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
+            </Flex>
+          );
+          break;
+
         default:
           break;
       }
@@ -311,12 +384,14 @@ export const OptionRenderer = ({
     return (
       <Box flex={1}>
         <Separator />
-        <Box>{layoutMap.inchant}</Box>
+        <Box marginTop={4}>{layoutMap.inchant}</Box>
         <Flex
           gap={4}
           justifyContent="space-between"
           alignItems="flex-start"
           marginTop={2}
+          fontSize={{ mdDown: "xs", md: "sm" }}
+          flexDirection={{ mdDown: "column", md: "row" }}
         >
           <Box>
             <Box>
@@ -339,8 +414,13 @@ export const OptionRenderer = ({
               {layoutMap.options}
             </Box>
             <Box>{layoutMap.set}</Box>
+            <Box>{layoutMap.totemEffect}</Box>
           </Box>
-          <Box>{layoutMap.color}</Box>
+          <Box>
+            <Box>{layoutMap.totemOption}</Box>
+            <Box>{layoutMap.totemLimit}</Box>
+            <Box>{layoutMap.color}</Box>
+          </Box>
         </Flex>
       </Box>
     );

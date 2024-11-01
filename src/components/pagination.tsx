@@ -36,7 +36,7 @@ const Pagination: React.FC<PaginationProps> = ({
         aria-label="Previous page"
         variant="outline"
         colorScheme="green"
-        size="sm"
+        size={{ smDown: 'xs', sm: 'sm' }}
         onClick={() => handlePageChange(page - 1)}
         disabled={page === 1}
       >
@@ -48,7 +48,7 @@ const Pagination: React.FC<PaginationProps> = ({
           key={pageNumber}
           variant={page === pageNumber ? "solid" : "outline"}
           colorScheme="green"
-          size="sm"
+          size={{ smDown: 'xs', sm: 'sm' }}
           onClick={() => handlePageChange(pageNumber)}
         >
           {pageNumber}
@@ -59,7 +59,7 @@ const Pagination: React.FC<PaginationProps> = ({
         aria-label="Next page"
         variant="outline"
         colorScheme="green"
-        size="sm"
+        size={{ smDown: 'xs', sm: 'sm' }}
         onClick={() => handlePageChange(page + 1)}
         disabled={page === 1}
       >

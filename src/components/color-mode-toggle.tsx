@@ -10,7 +10,7 @@ export function ColorModeToggle() {
     setTheme(theme === "light" ? "dark" : "light")
   }
   return (
-    <IconButton aria-label="toggle color mode" onClick={toggleColorMode}>
+    <IconButton aria-label="toggle color mode" onClick={toggleColorMode} size={{ smDown: 'xs', sm: 'md' }}>
       {theme === "light" ? <HiMoon /> : <HiSun />}
     </IconButton>
   )

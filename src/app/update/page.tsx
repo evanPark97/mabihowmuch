@@ -5,16 +5,11 @@ import {
   Text,
   Card,
   CardBody,
-  Separator,
-  Avatar,
   Badge,
-  Span,
-  TimelineConnector,
   TimelineContent,
   TimelineItem,
   TimelineRoot,
 } from "@chakra-ui/react";
-import { LuCheck } from "react-icons/lu";
 
 const Update = () => {
   return (

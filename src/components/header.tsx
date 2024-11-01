@@ -13,7 +13,7 @@ const Header = () => {
       <Flex gap={4} justifyContent="space-between" alignItems="center">
         <Link href={"/"}>
           <Text
-            fontSize={24}
+            fontSize={{ mdDown: 14, md: 24 }}
             fontWeight={600}
             _hover={{
               textDecoration: "underline",
@@ -27,6 +27,7 @@ const Header = () => {
             <Button
               variant="outline"
               colorScheme="green"
+              size={{ smDown: 'xs', sm: 'md' }}
               onClick={() => route.push("/update")}
             >
               업데이트 노트
@@ -35,6 +36,7 @@ const Header = () => {
             <Button
               variant="outline"
               colorScheme="green"
+              size={{ smDown: 'xs', sm: 'md' }}
               onClick={() => route.push("/auction")}
             >
               경매장 검색

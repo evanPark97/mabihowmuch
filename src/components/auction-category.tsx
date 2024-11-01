@@ -52,7 +52,7 @@ const TreeItem = ({ title, items, onSelectItem }: TreeItemProps) => {
           _hover={{ backgroundColor: "whiteAlpha.300", borderRadius: 4 }}
         >
           {isOpen ? <HiChevronDown /> : <HiChevronRight /> }
-          <Text fontWeight="bold" fontSize={18}>
+          <Text fontWeight="bold" fontSize={16}>
             {title}
           </Text>
         </Flex>
@@ -62,7 +62,7 @@ const TreeItem = ({ title, items, onSelectItem }: TreeItemProps) => {
           {items.map((item) => (
             <Text
               key={item}
-              fontSize={16}
+              fontSize={14}
               cursor="pointer"
               onClick={() => handleSelectItem(item)}
               _hover={{ color: "green.500" }}

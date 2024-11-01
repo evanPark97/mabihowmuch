@@ -20,17 +20,23 @@ import {
   Badge,
   Input,
   Button,
-  NativeSelectRoot,
-  NativeSelectField,
   Text,
-  Field,
+  Show,
+  DrawerActionTrigger,
+  DrawerBackdrop,
+  DrawerBody,
+  DrawerCloseTrigger,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerRoot,
+  DrawerTitle,
+  DrawerTrigger,
 } from "@chakra-ui/react";
 import { Toaster, toaster } from "@/components/ui/toaster";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 
 const Auction = () => {
-  const route = useRouter();
   const NEXON_API = new NexonAPI();
   const { optionFlag, toggleOptionFlag } = useOptionFlagStore();
   const [params, setParams] = useState<IAuctionRequestParams>({});
@@ -139,12 +145,12 @@ const Auction = () => {
   };
 
   const handleReset = () => {
-    route.refresh();
+    window.location.reload();
   };
 
   return (
     <Flex
-      padding={[0, 20]}
+      padding={{ smDown: 2, smToXl: 6 }}
       direction="column"
       gap={4}
       justifyContent="center"
@@ -160,18 +166,19 @@ const Auction = () => {
           status="info"
           borderRadius={8}
           title={`카테고리와 검색어 중 우선 적용된 사항 한 가지만 검색에 적용됩니다. 다른 조건으로 검색하려면 초기화 후 검색을 진행해주세요!`}
+          fontSize={{ smDown: 'xs', sm: 'sm' }}
         />
         <Card.Root>
           <CardBody borderWidth={1} borderRadius={8}>
-            <Flex justifyContent="space-between" alignItems="center" gap={4}>
-              <Flex flex={1} gap={2} alignItems="center" maxW={180}>
+            <Flex flexDirection="column" gap={4}>
+              <Flex flex={1} gap={2} alignItems="center">
                 <Box>
                   <Text fontSize={20} fontWeight={600}>
                     경매장 검색
                   </Text>
                 </Box>
                 {params?.auction_item_category && (
-                  <Badge variant="subtle" colorScheme="teal" fontSize={18}>
+                  <Badge variant="subtle" colorPalette="green" fontSize={14}>
                     {params.auction_item_category}
                   </Badge>
                 )}
@@ -185,15 +192,21 @@ const Auction = () => {
                   onChange={handleInputChange}
                 />
               </Box>
-              <Flex gap={4}>
+              <Flex gap={4} justifyContent="flex-end">
                 <Button
                   width={150}
                   colorScheme="green"
+                  size={{ smDown: 'xs', sm: 'sm' }}
                   onClick={() => handleAuctionSearch()}
                 >
                   검색
                 </Button>
-                <Button width={100} colorScheme="gray" onClick={handleReset}>
+                <Button
+                  width={100}
+                  colorScheme="gray"
+                  size={{ smDown: 'xs', sm: 'sm' }}
+                  onClick={() => handleReset()}
+                >
                   초기화
                 </Button>
               </Flex>
@@ -231,8 +244,32 @@ const Auction = () => {
             </Flex> */}
           </CardBody>
         </Card.Root>
+        <Box display={{ lg: 'none' }}>
+          <DrawerRoot placement="start">
+            <DrawerBackdrop />
+            <DrawerTrigger asChild>
+              <Button variant="outline" size="sm" width="full">
+                카테고리
+              </Button>
+            </DrawerTrigger>
+            <DrawerContent position="fixed" top={0} left={0} bottom={0}>
+              <DrawerHeader>
+                <DrawerTitle>카테고리</DrawerTitle>
+              </DrawerHeader>
+              <DrawerBody>
+                <AuctionCategory onSelectItem={handleSelectCategory} />
+              </DrawerBody>
+              <DrawerFooter>
+                <DrawerActionTrigger asChild>
+                  <Button variant="outline">닫기</Button>
+                </DrawerActionTrigger>
+              </DrawerFooter>
+              <DrawerCloseTrigger />
+            </DrawerContent>
+          </DrawerRoot>
+        </Box>
         <Flex gap={4}>
-          <Card.Root flex={2} minW={250}>
+          <Card.Root flex={1} minW={200} display={{ lgDown: 'none' }}>
             <CardBody borderWidth={1}>
               <AuctionCategory onSelectItem={handleSelectCategory} />
             </CardBody>
