@@ -11,26 +11,36 @@ import {
   Skeleton,
   CardBody,
   Card,
+  Button,
+  DialogActionTrigger,
+  DialogBody,
+  DialogCloseTrigger,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogRoot,
+  DialogTitle,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { OptionRenderer } from "./item-option";
+import { useOptionFlagStore } from "@/stores/useOptionFlagStore";
 
 export const AuctionItem = ({
   item,
   loading,
-  optionFlag,
 }: {
   item: IAuctionItem;
   loading: boolean;
-  optionFlag: boolean;
 }) => {
+  const { optionFlag } = useOptionFlagStore();
   const [optionGroup, setOptionGroup] = useState<{
     [key: string]: IAuctionItemOption[];
   }>();
+  const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
     itemOptionSeperator(item.item_option);
-  }, [item, optionFlag]);
+  }, [item]);
 
   const itemOptionSeperator = useCallback(
     (option: IAuctionItemOption[]) => {
@@ -51,25 +61,69 @@ export const AuctionItem = ({
   );
 
   return (
-    <Skeleton isLoaded={!loading}>
-      <Card>
+    <Skeleton loading={loading}>
+      {!optionFlag && (
+        <DialogRoot
+          size="xl"
+          motionPreset="slide-in-bottom"
+          lazyMount
+          preventScroll={false}
+          open={openDialog}
+        >
+          <DialogContent position="absolute" zIndex={100}>
+            <DialogHeader>
+              <DialogTitle>{item.item_display_name}</DialogTitle>
+            </DialogHeader>
+            <DialogBody>
+              {optionGroup && <OptionRenderer itemOption={optionGroup} />}
+            </DialogBody>
+            <DialogFooter>
+              <DialogActionTrigger asChild>
+                <Button variant="solid" onClick={() => setOpenDialog(false)}>
+                  닫기
+                </Button>
+              </DialogActionTrigger>
+            </DialogFooter>
+            <DialogCloseTrigger />
+          </DialogContent>
+        </DialogRoot>
+      )}
+      <Card.Root
+        backgroundColor={{
+          _dark: openDialog ? "whiteAlpha.300" : "",
+          _light: openDialog ? "blackAlpha.300" : "",
+        }}
+      >
         <CardBody borderWidth={1} borderRadius={8}>
           <Box>
             <Flex justifyContent="space-between" alignItems="flex-end">
-              <Text fontSize={20} fontWeight={600}>
-                {item.item_display_name}
-              </Text>
+              <Flex gap={2} alignItems="center" position="relative">
+                <Text fontSize={20} fontWeight={600}>
+                  {item.item_display_name}
+                </Text>
+                {!optionFlag && (
+                  <Button
+                    variant="outline"
+                    colorScheme="green"
+                    size="sm"
+                    onClick={() => setOpenDialog(true)}
+                  >
+                    옵션 보기
+                  </Button>
+                )}
+              </Flex>
               <Text fontSize={18} fontWeight={600}>
                 {item.auction_price_per_unit.toLocaleString()} 골드
               </Text>
             </Flex>
-            
-            <Flex gap={4} marginTop={2}>
-              {optionGroup && <OptionRenderer itemOption={optionGroup} />}
-            </Flex>
+            {optionFlag && (
+              <Flex gap={4} marginTop={2}>
+                {optionGroup && <OptionRenderer itemOption={optionGroup} />}
+              </Flex>
+            )}
           </Box>
         </CardBody>
-      </Card>
+      </Card.Root>
     </Skeleton>
   );
 };

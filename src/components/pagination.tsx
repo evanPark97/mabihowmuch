@@ -1,6 +1,6 @@
 import { Flex, Box, Button, IconButton } from "@chakra-ui/react";
-import { ArrowBackIcon, ArrowForwardIcon } from "@chakra-ui/icons";
 import React from "react";
+import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
 
 interface PaginationProps {
   page: number;
@@ -34,19 +34,20 @@ const Pagination: React.FC<PaginationProps> = ({
     <Flex justify="center" gap={4} marginY={4}>
       <IconButton
         aria-label="Previous page"
-        icon={<ArrowBackIcon />}
         variant="outline"
-        colorScheme="teal"
+        colorScheme="green"
         size="sm"
         onClick={() => handlePageChange(page - 1)}
         disabled={page === 1}
-      />
+      >
+        <HiArrowLeft />
+      </IconButton>
 
       {getPageNumbers().map((pageNumber) => (
         <Button
           key={pageNumber}
           variant={page === pageNumber ? "solid" : "outline"}
-          colorScheme="teal"
+          colorScheme="green"
           size="sm"
           onClick={() => handlePageChange(pageNumber)}
         >
@@ -56,13 +57,14 @@ const Pagination: React.FC<PaginationProps> = ({
 
       <IconButton
         aria-label="Next page"
-        icon={<ArrowForwardIcon />}
         variant="outline"
-        colorScheme="teal"
+        colorScheme="green"
         size="sm"
         onClick={() => handlePageChange(page + 1)}
-        disabled={page === totalPages}
-      />
+        disabled={page === 1}
+      >
+        <HiArrowRight />
+      </IconButton>
     </Flex>
   );
 };

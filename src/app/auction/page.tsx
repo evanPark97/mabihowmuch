@@ -3,41 +3,44 @@ import AuctionCategory from "@/components/auction-category";
 import Caution from "@/components/caution";
 import { AuctionItem } from "@/components/item";
 import Pagination from "@/components/pagination";
+import { Alert } from "@/components/ui/alert";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   IAuctionRequestParams,
   IAuctionResponse,
   Item,
 } from "@/interface/auction-list";
+import { useOptionFlagStore } from "@/stores/useOptionFlagStore";
 import NexonAPI from "@/utils/nexon-api";
 import {
-  Alert,
-  AlertIcon,
-  Badge,
-  Box,
-  Button,
+  Flex,
   Card,
   CardBody,
-  Checkbox,
-  Flex,
+  Box,
+  Badge,
   Input,
-  InputGroup,
-  InputLeftAddon,
-  Select,
+  Button,
+  NativeSelectRoot,
+  NativeSelectField,
   Text,
+  Field,
 } from "@chakra-ui/react";
+import { Toaster, toaster } from "@/components/ui/toaster";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-const Store = () => {
+const Auction = () => {
+  const route = useRouter();
   const NEXON_API = new NexonAPI();
+  const { optionFlag, toggleOptionFlag } = useOptionFlagStore();
   const [params, setParams] = useState<IAuctionRequestParams>({});
 
   const [loading, setLoading] = useState(false);
-  // Fillter
-  const [optionFlag, setOptionFlag] = useState(false);
-
   const [auctionData, setAuctionData] = useState<Item[]>([]);
   // Pagination
-  const [pagenationAuctionData, setPagenationAuctionData] = useState<Item[]>([]);
+  const [pagenationAuctionData, setPagenationAuctionData] = useState<Item[]>(
+    []
+  );
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
 
@@ -45,9 +48,6 @@ const Store = () => {
     setPage(1);
   }, []);
 
-  /**
-   *
-   */
   const handleAuctionSearch = async () => {
     setLoading(true);
     try {
@@ -57,17 +57,19 @@ const Store = () => {
       setParams({ ...params, cursor: response.next_cursor });
       setAuctionData(response.auction_item);
       auctionItemListPagenator();
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      if (error?.status == 400) {
+        toaster.create({
+          type: "error",
+          title: "검색 실패",
+          description: "경매장에서 아이템 목록을 불러오는데 실패하였습니다.",
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  /**
-   *
-   * @returns
-   */
   const appendAuctionItemList = async () => {
     setLoading(true);
     try {
@@ -81,8 +83,14 @@ const Store = () => {
       setParams({ ...params, cursor: response.next_cursor });
       setAuctionData(auctionData?.concat(response.auction_item));
       auctionItemListPagenator();
-    } catch (error) {
-      console.log(error);
+    } catch (error: any) {
+      if (error?.status == 400) {
+        toaster.create({
+          type: "error",
+          title: "검색 실패",
+          description: "경매장에서 아이템 목록을 불러오는데 실패하였습니다.",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -92,9 +100,6 @@ const Store = () => {
     auctionItemListPagenator();
   }, [page, auctionData]);
 
-  /**
-   *
-   */
   const auctionItemListPagenator = () => {
     if (auctionData) {
       const pagenationList = auctionData.slice(
@@ -106,10 +111,6 @@ const Store = () => {
   };
 
   const totalPages = auctionData ? Math.ceil(auctionData.length / pageSize) : 0;
-  /**
-   *
-   * @param newPage
-   */
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= totalPages) {
       if (totalPages - newPage <= 1) {
@@ -119,10 +120,6 @@ const Store = () => {
     }
   };
 
-  /**
-   *
-   * @param e
-   */
   const handleInputChange = (e: any) => {
     const { value, name } = e.target;
     if (value) {
@@ -133,56 +130,38 @@ const Store = () => {
     }
   };
 
-  /**
-   *
-   * @param category
-   */
   const handleSelectCategory = (category: string) => {
     setParams({ ...params, auction_item_category: category });
   };
 
-  /**
-   *
-   * @param e
-   */
-  const handleOptionFlag = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    if (value === "on") {
-      setOptionFlag(true);
-    } else {
-      setOptionFlag(false);
-    }
+  const handleOptionFlag = () => {
+    toggleOptionFlag();
   };
 
-  /**
-   * 
-   */
   const handleReset = () => {
-    setParams({})
-    setAuctionData([])
-    setPagenationAuctionData([])
-    setPage(1)
-  }
+    route.refresh();
+  };
 
   return (
     <Flex
       padding={[0, 20]}
       direction="column"
-      gap={8}
-      gridRowStart={2}
+      gap={4}
       justifyContent="center"
       alignItems="center"
-      maxWidth={1280}
-      minH="100svh"
-      margin="auto"
+      width="100vw"
+      maxW={1920}
+      flex={1}
     >
+      <Toaster />
       <Caution />
       <Flex direction="column" gap={4} width="100%">
-        <Alert status="info" borderRadius={8}>
-          <AlertIcon />
-          <Text>카테고리와 검색어 중 우선 적용된 사항 한 가지만 검색에 적용됩니다!</Text>
-        </Alert>
-        <Card>
+        <Alert
+          status="info"
+          borderRadius={8}
+          title={`카테고리와 검색어 중 우선 적용된 사항 한 가지만 검색에 적용됩니다. 다른 조건으로 검색하려면 초기화 후 검색을 진행해주세요!`}
+        />
+        <Card.Root>
           <CardBody borderWidth={1} borderRadius={8}>
             <Flex justifyContent="space-between" alignItems="center" gap={4}>
               <Flex flex={1} gap={2} alignItems="center" maxW={180}>
@@ -191,16 +170,18 @@ const Store = () => {
                     경매장 검색
                   </Text>
                 </Box>
-                <Badge variant="subtle" colorScheme="teal" fontSize={18}>
-                  {params?.auction_item_category}
-                </Badge>
+                {params?.auction_item_category && (
+                  <Badge variant="subtle" colorScheme="teal" fontSize={18}>
+                    {params.auction_item_category}
+                  </Badge>
+                )}
               </Flex>
               <Box flex={1}>
                 <Input
-                  variant="filled"
+                  variant="subtle"
                   name="item_name"
                   placeholder="검색"
-                  defaultValue={params.item_name}
+                  value={params.item_name}
                   onChange={handleInputChange}
                 />
               </Box>
@@ -212,58 +193,51 @@ const Store = () => {
                 >
                   검색
                 </Button>
-                <Button
-                  width={100}
-                  colorScheme="gray"
-                  onClick={() => handleReset()}
-                >
+                <Button width={100} colorScheme="gray" onClick={handleReset}>
                   초기화
                 </Button>
               </Flex>
             </Flex>
           </CardBody>
-        </Card>
-        {/* <Card>
+        </Card.Root>
+        <Card.Root>
           <CardBody borderWidth={1} borderRadius={8}>
             <Flex justifyContent="space-between" alignItems="center" gap={4}>
-              <Checkbox defaultChecked={optionFlag} onChange={handleOptionFlag}>
+              <Checkbox checked={optionFlag} onChange={handleOptionFlag}>
                 아이템 옵션 같이보기
               </Checkbox>
             </Flex>
-            <Flex gap={4} marginTop={4}>
-              <InputGroup>
-                <InputLeftAddon>에르그</InputLeftAddon>
-                <Select>
+            {/* <Flex gap={4} marginTop={4}>
+              <NativeSelectRoot>
+                <NativeSelectField placeholder="에르그" name="ergue">
                   <option value="">전체</option>
                   <option value="B">B</option>
                   <option value="A">A</option>
                   <option value="S">S</option>
-                </Select>
-                <Input type="number" max={50} />
-              </InputGroup>
-              <InputGroup>
-                <InputLeftAddon>세공 랭크</InputLeftAddon>
-                <Select>
+                </NativeSelectField>
+              </NativeSelectRoot>
+              <NativeSelectRoot>
+                <NativeSelectField placeholder="세공 랭크" name="rank">
                   <option value="">전체</option>
                   <option value="3">3</option>
                   <option value="2">2</option>
                   <option value="1">1</option>
-                </Select>
-              </InputGroup>
-              <InputGroup>
-                <InputLeftAddon>세공 옵션</InputLeftAddon>
-                <Input type="text" />
-              </InputGroup>
-            </Flex>
+                </NativeSelectField>
+              </NativeSelectRoot>
+              <Field.Root orientation="horizontal">
+                <Field.Label>세공 옵션</Field.Label>
+                <Input placeholder="세공 옵션" flex="1" />
+              </Field.Root>
+            </Flex> */}
           </CardBody>
-        </Card> */}
+        </Card.Root>
         <Flex gap={4}>
-          <Card flex={2}>
-            <CardBody borderWidth={1} borderRadius={8}>
+          <Card.Root flex={2} minW={250}>
+            <CardBody borderWidth={1}>
               <AuctionCategory onSelectItem={handleSelectCategory} />
             </CardBody>
-          </Card>
-          <Card flex={6}>
+          </Card.Root>
+          <Card.Root flex={6}>
             <CardBody padding="10px 20px" borderWidth={1} borderRadius={8}>
               {pagenationAuctionData.length > 0 ? (
                 <>
@@ -274,12 +248,7 @@ const Store = () => {
                   />
                   <Flex direction="column" gap={4}>
                     {pagenationAuctionData.map((item, index) => (
-                      <AuctionItem
-                        key={index}
-                        item={item}
-                        loading={loading}
-                        optionFlag={optionFlag}
-                      />
+                      <AuctionItem key={index} item={item} loading={loading} />
                     ))}
                   </Flex>
                   <Pagination
@@ -288,17 +257,17 @@ const Store = () => {
                     onPageChange={handlePageChange}
                   />
                 </>
-              ): (
+              ) : (
                 <Flex justifyContent="center" align="center" height="100%">
                   조회된 내용이 없습니다!
                 </Flex>
               )}
             </CardBody>
-          </Card>
+          </Card.Root>
         </Flex>
       </Flex>
     </Flex>
   );
 };
 
-export default Store;
+export default Auction;

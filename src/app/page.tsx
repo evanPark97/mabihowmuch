@@ -9,30 +9,32 @@ export default function Home() {
     <Flex
       padding={[0, 20]}
       direction="column"
-      gap={8}
-      gridRowStart={2}
+      gap={4}
       justifyContent="center"
       alignItems="center"
-      minH="100svh"
+      flex={1}
     >
-      <Text fontSize={20} fontWeight={600} textAlign="center" letterSpacing={6}>
+      <Text fontSize={24} fontWeight={600} textAlign="center" letterSpacing={6}>
         지금얼맙?
       </Text>
-      <Box boxSize="xl">
-        <Caution />
-        <Card width="xl" marginTop={8}>
-          <CardBody>
+      <Card.Root marginTop={4}>
+        <CardBody>
+          <Caution />
+          <Box marginTop={6}>
             <Flex direction="column" gap={4}>
-              <Button colorScheme="green" onClick={() => alert("페이지 준비중입니다!")}>
-                NPC 상점 검색
-              </Button>
               <Button colorScheme="green" onClick={() => route.push("auction")}>
                 경매장 검색
               </Button>
+              <Button
+                colorScheme="green"
+                onClick={() => alert("페이지 준비중입니다!")}
+              >
+                NPC 상점 검색
+              </Button>
             </Flex>
-          </CardBody>
-        </Card>
-      </Box>
+          </Box>
+        </CardBody>
+      </Card.Root>
     </Flex>
   );
 }

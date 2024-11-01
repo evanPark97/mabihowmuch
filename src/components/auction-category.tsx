@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Box, Text, Icon, Collapse, VStack } from "@chakra-ui/react";
-import { ChevronDownIcon, ChevronRightIcon } from "@chakra-ui/icons";
+import { Text, Collapsible, VStack, Flex } from "@chakra-ui/react";
 import { AUCTION_CATEGORY, AuctionCategoryEnum } from "@/utils/constant";
+import { HiChevronDown, HiChevronRight } from "react-icons/hi";
 
 type AuctionCategoryProps = {
   onSelectItem: (itemName: string) => void;
@@ -9,7 +9,7 @@ type AuctionCategoryProps = {
 
 const AuctionCategory = ({ onSelectItem }: AuctionCategoryProps) => {
   return (
-    <VStack align="start" spacing={1}>
+    <VStack align="start" gap={1}>
       {(
         Object.keys(AUCTION_CATEGORY) as Array<keyof typeof AuctionCategoryEnum>
       ).map((category) => (
@@ -41,21 +41,24 @@ const TreeItem = ({ title, items, onSelectItem }: TreeItemProps) => {
   };
 
   return (
-    <Box width="100%" marginBottom={2}>
-      <Box
-        display="flex"
-        alignItems="center"
-        cursor="pointer"
-        onClick={toggleOpen}
-        py={2}
-        px={3}
-        _hover={{ backgroundColor: "whiteAlpha.300", borderRadius: 4 }}
-      >
-        <Icon as={isOpen ? ChevronDownIcon : ChevronRightIcon} mr={2} />
-        <Text fontWeight="bold" fontSize={18}>{title}</Text>
-      </Box>
-      <Collapse in={isOpen} animateOpacity>
-        <VStack align="start" pl={8} spacing={1}>
+    <Collapsible.Root width="100%" marginBottom={2}>
+      <Collapsible.Trigger>
+        <Flex
+          alignItems="center"
+          cursor="pointer"
+          onClick={toggleOpen}
+          py={2}
+          px={3}
+          _hover={{ backgroundColor: "whiteAlpha.300", borderRadius: 4 }}
+        >
+          {isOpen ? <HiChevronDown /> : <HiChevronRight /> }
+          <Text fontWeight="bold" fontSize={18}>
+            {title}
+          </Text>
+        </Flex>
+      </Collapsible.Trigger>
+      <Collapsible.Content>
+        <VStack align="start" pl={8} gap={1}>
           {items.map((item) => (
             <Text
               key={item}
@@ -68,8 +71,8 @@ const TreeItem = ({ title, items, onSelectItem }: TreeItemProps) => {
             </Text>
           ))}
         </VStack>
-      </Collapse>
-    </Box>
+      </Collapsible.Content>
+    </Collapsible.Root>
   );
 };
 

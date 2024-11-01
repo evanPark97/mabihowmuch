@@ -1,6 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false, // StrictMode 비활성화
+  reactStrictMode: true,
+  experimental: {
+    externalDir: true,
+    optimizePackageImports: ["@chakra-ui/react"],
+  },
 };
 
 export default nextConfig;

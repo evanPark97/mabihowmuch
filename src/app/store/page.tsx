@@ -1,4 +1,6 @@
 "use client";
+import Caution from "@/components/caution";
+import { NumberInputField } from "@/components/ui/number-input";
 import {
   INpcShopParams,
   INpcShopRequestParams,
@@ -13,17 +15,12 @@ import {
   CardBody,
   Flex,
   Image,
-  ListItem,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Select,
+  NativeSelectField,
+  NativeSelectRoot,
+  NumberInputRoot,
   Text,
-  UnorderedList,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 
 const Store = () => {
   const NEXON_API = new NexonAPI();
@@ -51,7 +48,7 @@ const Store = () => {
     setShopData(response);
   };
 
-  const handleInputChange = (e: any) => {
+  const handleInputChange = (e: ChangeEvent<HTMLSelectElement>) => {
     const { value, name } = e.target;
     setParams({
       ...params,
@@ -59,7 +56,7 @@ const Store = () => {
     });
   };
 
-  const handleChannelValue = (value: string) => {
+  const handleChannelValue = (value: any) => {
     setParams({ ...params, channel: Number(value) });
   };
 
@@ -78,80 +75,58 @@ const Store = () => {
       </Text>
       <Flex gap={4}>
         <Box>
-          <Card width="xl">
+          <Card.Root width="xl">
             <CardBody>
               <Box>
                 <Text marginBottom={4} fontSize={18} fontWeight={600}>
                   확인사항!
                 </Text>
-                <UnorderedList>
-                  <ListItem>
-                    마비노기의 게임 데이터는 평균 10분 후 확인 가능합니다.
-                  </ListItem>
-                  <ListItem>
-                    마비노기의 상점 정보는 36분마다 변경됩니다.
-                  </ListItem>
-                  <ListItem>
-                    현재 일부 NPC 대상으로 상점 정보가 공개되며, 추후 제공되는
-                    NPC가 추가될 수 있습니다.
-                  </ListItem>
-                  <ListItem>
-                    반짝이는 색상의 코드 정보는 제공되지 않습니다.
-                  </ListItem>
-                </UnorderedList>
+                <Caution />
               </Box>
             </CardBody>
-          </Card>
-          <Card width="xl">
+          </Card.Root>
+          <Card.Root width="xl">
             <CardBody>
               <Flex direction="column" gap={4}>
-                <Select
-                  placeholder="서버"
-                  name="server_name"
-                  onChange={handleInputChange}
-                >
-                  {SERVER_NAME.map((server, index) => (
-                    <option key={index} value={server}>
-                      {server}
-                    </option>
-                  ))}
-                </Select>
-                <Select
-                  placeholder="NPC"
-                  name="npc_name"
-                  onChange={handleInputChange}
-                >
-                  {NPC_NAME.map((npc, index) => (
-                    <option key={index} value={npc}>
-                      {npc}
-                    </option>
-                  ))}
-                </Select>
-                <NumberInput
+                <NativeSelectRoot>
+                  <NativeSelectField placeholder="서버" name="server_name" onChange={handleInputChange}>
+                    {SERVER_NAME.map((server, index) => (
+                      <option key={index} value={server}>
+                        server
+                      </option>
+                    ))}
+                  </NativeSelectField>
+                </NativeSelectRoot>
+                <NativeSelectRoot>
+                  <NativeSelectField placeholder="NPC" name="npc_name" onChange={handleInputChange}>
+                    {NPC_NAME.map((npc, index) => (
+                      <option key={index} value={npc}>
+                        {npc}
+                      </option>
+                    ))}
+                  </NativeSelectField>
+                </NativeSelectRoot>
+                <NumberInputRoot
                   size="md"
                   maxW={24}
-                  defaultValue={1}
+                  defaultValue="1"
                   min={1}
                   max={15}
                   name="channel"
-                  onChange={handleChannelValue}
+                  onValueChange={handleChannelValue}
                 >
                   <NumberInputField />
-                  <NumberInputStepper>
-                    <NumberIncrementStepper />
-                    <NumberDecrementStepper />
-                  </NumberInputStepper>
-                </NumberInput>
+                </NumberInputRoot>
                 <Button colorScheme="green" onClick={() => handleNpcShopList()}>
                   검색
                 </Button>
               </Flex>
             </CardBody>
-          </Card>
+          </Card.Root>
         </Box>
         <Box>
           {shopData && (
-            <Card width="xl">
+            <Card.Root width="xl">
               <CardBody>
                 <Flex direction="column" gap={4}>
                   {shopData.shop.map((tab, index) => (
@@ -186,7 +161,7 @@ const Store = () => {
                   ))}
                 </Flex>
               </CardBody>
-            </Card>
+            </Card.Root>
           )}
         </Box>
       </Flex>

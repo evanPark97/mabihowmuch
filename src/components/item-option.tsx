@@ -1,25 +1,25 @@
 import { ItemOption as IAuctionItemOption } from "@/interface/auction-list";
-import { Flex, Box, Text } from "@chakra-ui/react";
+import { Flex, Box, Text, Separator } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
 
 const OptionValueRenderer = (option: IAuctionItemOption) => {
   const rankColor = (rank: string | null) => {
     switch (rank) {
       case "3":
-        return "white";
+        return "";
       case "2":
-        return "blue.500";
+        return "yellow.500";
       case "1":
         return "pink.500";
       default:
-        return "white";
+        return "";
     }
   };
 
   switch (option.option_type) {
     case "공격":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
           <Text>~</Text>
           <Text>{option.option_value2}</Text>
@@ -28,7 +28,7 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
 
     case "내구력":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
           <Text>/</Text>
           <Text>{option.option_value2}</Text>
@@ -37,21 +37,21 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
 
     case "밸런스":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
         </Flex>
       );
 
     case "크리티컬":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
         </Flex>
       );
 
     case "특별 개조":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_sub_type}</Text>
           <Text>{option.option_value}</Text>
         </Flex>
@@ -59,7 +59,7 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
 
     case "에르그":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_sub_type}</Text>
           <Text>{option.option_value}</Text>
           <Text>/</Text>
@@ -69,39 +69,42 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
 
     case "세트 효과":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
           <Text>({option.option_value2})</Text>
         </Flex>
       );
     case "남은 전용 해제 가능 횟수":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
         </Flex>
       );
 
     case "아이템 색상":
       return (
-        <Flex gap={1} alignItems="center" key={uuidv4()}>
+        <Flex gap={2} alignItems="center" key={uuidv4()}>
           <Box
             width={5}
             height={5}
             marginRight={1}
             borderRadius={10}
             background={`rgb(${option.option_value})`}
+            borderWidth={1}
           ></Box>
-          <Text>{option.option_value}</Text>
-          <Text>{option.option_value2}</Text>
+          <Text>{option.option_sub_type}</Text>
+          <Text>
+            {option.option_value ? option.option_value : option.option_desc}
+          </Text>
         </Flex>
       );
 
     case "인챈트":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex key={uuidv4()} flexDirection="column" marginBottom={2}>
           <Flex gap={1}>
-            <Text>{option.option_sub_type}</Text>
-            <Text>{option.option_value}</Text>
+            <Text fontWeight={600}>{option.option_sub_type}</Text>
+            <Text fontWeight={600}>{option.option_value}</Text>
           </Flex>
           <Box>
             <Text>{option.option_desc}</Text>
@@ -111,7 +114,7 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
 
     case "인챈트 불가능":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
           <Text>{option.option_value2}</Text>
         </Flex>
@@ -119,14 +122,14 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
 
     case "보석 개조":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
         </Flex>
       );
 
     case "일반 개조":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
           <Text>/</Text>
           <Text>{option.option_value2}</Text>
@@ -135,8 +138,8 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
 
     case "세공 랭크":
       return (
-        <Flex gap={1} key={uuidv4()}>
-          <Text color={rankColor(option.option_value)}>
+        <Flex gap={2} key={uuidv4()}>
+          <Text color={rankColor(option.option_value)} fontWeight={600}>
             세공 {option.option_value} 랭크
           </Text>
         </Flex>
@@ -144,7 +147,7 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
 
     case "세공 옵션":
       return (
-        <Flex gap={1} key={uuidv4()}>
+        <Flex gap={2} key={uuidv4()}>
           <Text>{option.option_value}</Text>
         </Flex>
       );
@@ -168,8 +171,8 @@ export const OptionRenderer = ({
       switch (optionType) {
         case "공격":
           layoutMap.attack = (
-            <Flex gap={1} key="attack">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="attack">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -177,8 +180,8 @@ export const OptionRenderer = ({
 
         case "내구력":
           layoutMap.durability = (
-            <Flex gap={1} key="durability">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="durability">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -186,8 +189,8 @@ export const OptionRenderer = ({
 
         case "밸런스":
           layoutMap.balance = (
-            <Flex gap={1} key="balance">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="balance">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -195,8 +198,8 @@ export const OptionRenderer = ({
 
         case "크리티컬":
           layoutMap.critical = (
-            <Flex gap={1} key="critical">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="critical">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -204,8 +207,8 @@ export const OptionRenderer = ({
 
         case "특별 개조":
           layoutMap.special = (
-            <Flex gap={1} key="special">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="special">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -213,8 +216,8 @@ export const OptionRenderer = ({
 
         case "에르그":
           layoutMap.ergue = (
-            <Flex gap={1} key="ergue">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="ergue">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -222,8 +225,8 @@ export const OptionRenderer = ({
 
         case "세트 효과":
           layoutMap.set = (
-            <Flex gap={1} key="set">
-              <Text>{optionType}</Text>
+            <Flex key="set" flexDirection="column">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -231,8 +234,8 @@ export const OptionRenderer = ({
 
         case "남은 전용 해제 가능 횟수":
           layoutMap.belonging = (
-            <Flex gap={1} key="belonging">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="belonging">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -240,10 +243,12 @@ export const OptionRenderer = ({
 
         case "아이템 색상":
           layoutMap.color = (
-            <Flex gap={1} key="color">
-              <Text>{optionType}</Text>
-              <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
-            </Flex>
+            <Box gap={2} key="color">
+              <Text fontWeight={600} marginBottom={2}>{optionType}</Text>
+              <Flex gap={2} flexDirection="column">
+                {option.map((_option) => OptionValueRenderer(_option))}
+              </Flex>
+            </Box>
           );
           break;
 
@@ -257,8 +262,8 @@ export const OptionRenderer = ({
 
         case "인챈트 불가능":
           layoutMap.inchantAble = (
-            <Flex gap={1} key="inchantAble">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="inchantAble">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -266,8 +271,8 @@ export const OptionRenderer = ({
 
         case "보석 개조":
           layoutMap.gem = (
-            <Flex gap={1} key="gem">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="gem">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -275,8 +280,8 @@ export const OptionRenderer = ({
 
         case "일반 개조":
           layoutMap.alteration = (
-            <Flex gap={1} key="alteration">
-              <Text>{optionType}</Text>
+            <Flex gap={2} key="alteration">
+              <Text fontWeight={600}>{optionType}</Text>
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -284,7 +289,7 @@ export const OptionRenderer = ({
 
         case "세공 랭크":
           layoutMap.rank = (
-            <Flex gap={1} key="rank">
+            <Flex gap={2} key="rank">
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -292,7 +297,7 @@ export const OptionRenderer = ({
 
         case "세공 옵션":
           layoutMap.options = (
-            <Flex gap={1} key="options">
+            <Flex gap={2} key="options">
               <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
             </Flex>
           );
@@ -304,7 +309,8 @@ export const OptionRenderer = ({
     }
 
     return (
-      <Box>
+      <Box flex={1}>
+        <Separator />
         <Box>{layoutMap.inchant}</Box>
         <Flex
           gap={4}
