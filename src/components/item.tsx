@@ -20,10 +20,12 @@ import {
   DialogHeader,
   DialogRoot,
   DialogTitle,
+  Separator,
 } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
 import { OptionRenderer } from "./item-option";
 import { useOptionFlagStore } from "@/stores/useOptionFlagStore";
+import { formatCurrency } from "@/utils/common";
 
 export const AuctionItem = ({
   item,
@@ -73,7 +75,7 @@ export const AuctionItem = ({
           <DialogContent
             position="fixed"
             zIndex={100}
-            width='90%'
+            width="90%"
             left={{ smDown: 0, smToMd: 0 }}
             right={{ smDown: 0, smToMd: 0 }}
             top={{ mdDown: 0, md: 0 }}
@@ -126,7 +128,7 @@ export const AuctionItem = ({
                 {!optionFlag && (
                   <Button
                     variant="outline"
-                    colorScheme="green"
+                    colorPalette="green"
                     size={{ smDown: "xs", sm: "sm" }}
                     onClick={() => setOpenDialog(true)}
                   >
@@ -137,14 +139,14 @@ export const AuctionItem = ({
               <Flex flexDirection="column" alignItems="flex-end" width="100%">
                 {item.item_count > 1 && (
                   <Text fontSize={{ smDown: "xs", sm: "sm" }}>
-                    개당 {item.auction_price_per_unit.toLocaleString()} 골드
+                    개당 {formatCurrency(item.auction_price_per_unit)} 골드
                   </Text>
                 )}
                 <Text fontSize={{ smDown: "sm", sm: "md" }} fontWeight={600}>
-                  {(
+                  {formatCurrency(
                     item.auction_price_per_unit * item.item_count
-                  ).toLocaleString()}{" "}
-                  골드
+                  )}
+                  &nbsp;골드
                 </Text>
               </Flex>
             </Flex>
@@ -160,29 +162,150 @@ export const AuctionItem = ({
   );
 };
 
-export const ShopItem = ({ item }: { item: INpcShopItem }) => {
+export const ShopItem = ({
+  item,
+  loading,
+}: {
+  item: INpcShopItem;
+  loading: boolean;
+}) => {
+  const { optionFlag } = useOptionFlagStore();
+  const [optionGroup, setOptionGroup] = useState<{
+    [key: string]: IAuctionItemOption[];
+  }>();
+  const [openDialog, setOpenDialog] = useState(false);
+
+  useEffect(() => {
+    itemOptionSeperator(item.item_option);
+  }, [item]);
+
+  const itemOptionSeperator = useCallback(
+    (option: IAuctionItemOption[]) => {
+      const _optionGroup: { [key: string]: IAuctionItemOption[] } = {};
+      if (option) {
+        for (const _option of option) {
+          if (!_option.option_type) continue;
+
+          if (!_optionGroup[_option.option_type]) {
+            _optionGroup[_option.option_type] = [];
+          }
+          _optionGroup[_option.option_type].push(_option);
+        }
+        setOptionGroup(_optionGroup);
+      }
+    },
+    [item]
+  );
   return (
-    <Flex border="1px solid #FFF">
-      <Text>{item.item_display_name}</Text>
-      <Image src={item.image_url} objectFit="contain" />
-      <Flex>
-        {item.item_option.map((option, index) => (
-          <Box key={index}>
-            <Text>{option.option_desc}</Text>
-            <Text>{option.option_sub_type}</Text>
-            <Text>{option.option_type}</Text>
-            <Text>{option.option_value}</Text>
-            <Text>{option.option_value2}</Text>
-          </Box>
-        ))}
-      </Flex>
-      <Box>
-        {item.price.map((price, index) => (
-          <Text key={index}>
-            {price.price_type} | {price.price_value}
-          </Text>
-        ))}
-      </Box>
-    </Flex>
+    <Skeleton loading={loading} position="relative">
+      {!optionFlag && (
+        <DialogRoot
+          lazyMount
+          open={openDialog}
+          size={{ mdDown: "md", md: "lg" }}
+          motionPreset="slide-in-bottom"
+          scrollBehavior="inside"
+        >
+          <DialogContent
+            position="fixed"
+            zIndex={100}
+            width="90%"
+            left={{ smDown: 0, smToMd: 0 }}
+            right={{ smDown: 0, smToMd: 0 }}
+            top={{ mdDown: 0, md: 0 }}
+            bottom={{ mdDown: 0, md: 0 }}
+            padding={1}
+          >
+            <DialogHeader>
+              <DialogTitle>{item.item_display_name}</DialogTitle>
+            </DialogHeader>
+            <DialogBody>
+              <Box fontSize={{ mdDown: "xs", md: "sm" }}>
+                <Flex alignItems="center" gap={2} flexWrap="wrap">
+                  <Box>
+                    {item.price.map((price, index) => (
+                      <Text key={index}>
+                        {price.price_value.toLocaleString()} {price.price_type}
+                      </Text>
+                    ))}
+                  </Box>
+                </Flex>
+                <Text color="red.400">
+                  {item.limit_type &&
+                    `${item.limit_type} ${item.limit_value}개 제한`}
+                </Text>
+              </Box>
+              {optionGroup && <OptionRenderer itemOption={optionGroup} />}
+            </DialogBody>
+            <DialogFooter>
+              <DialogActionTrigger asChild>
+                <Button variant="solid" onClick={() => setOpenDialog(false)}>
+                  닫기
+                </Button>
+              </DialogActionTrigger>
+            </DialogFooter>
+            <DialogCloseTrigger />
+          </DialogContent>
+        </DialogRoot>
+      )}
+      <Card.Root>
+        <Card.Body>
+          <Flex alignItems="center" gap={8}>
+            <Image
+              src={item.image_url}
+              objectFit="contain"
+              backgroundPosition="center"
+              width="64px"
+              height="64px"
+              loading="lazy"
+            />
+            <Flex flex={1} gap={4} flexDirection="column">
+              <Box fontSize={{ mdDown: "xs", md: "sm" }}>
+                <Flex
+                  flex={1}
+                  gap={2}
+                  justifyContent="space-between"
+                  flexDirection={{ mdDown: "column", md: "row" }}
+                >
+                  <Text>
+                    {item.item_display_name}{" "}
+                    {item.item_count > 1 && `(${item.item_count} 개)`}
+                  </Text>
+                  <Box>
+                    {item.price.map((price, index) => (
+                      <Text key={index}>
+                        {formatCurrency(price.price_value)} {price.price_type}
+                      </Text>
+                    ))}
+                  </Box>
+                </Flex>
+                <Text color="red.400">
+                  {item.limit_type &&
+                    `${item.limit_type} ${item.limit_value}개 제한`}
+                </Text>
+              </Box>
+
+              {optionFlag ? (
+                <OptionRenderer itemOption={optionGroup} />
+              ) : (
+                optionGroup &&
+                Object.keys(optionGroup).length > 0 && (
+                  <Box>
+                    <Button
+                      variant="outline"
+                      colorPalette="green"
+                      size={{ smDown: "xs", sm: "sm" }}
+                      onClick={() => setOpenDialog(true)}
+                    >
+                      옵션 보기
+                    </Button>
+                  </Box>
+                )
+              )}
+            </Flex>
+          </Flex>
+        </Card.Body>
+      </Card.Root>
+    </Skeleton>
   );
 };

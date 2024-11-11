@@ -32,9 +32,13 @@ import {
   DrawerRoot,
   DrawerTitle,
   DrawerTrigger,
+  Field,
+  NativeSelectField,
+  Spinner,
 } from "@chakra-ui/react";
 import { Toaster, toaster } from "@/components/ui/toaster";
 import { useEffect, useState } from "react";
+import { NativeSelectRoot } from "@/components/ui/native-select";
 
 const Auction = () => {
   const NEXON_API = new NexonAPI();
@@ -49,19 +53,46 @@ const Auction = () => {
   );
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
+  const [filter, setFilter] = useState({
+    ergue: "",
+    ergueMin: "",
+    ergueMax: "",
+    rank: "",
+    option: "",
+    inchantHead: "",
+    inchantTail: "",
+  });
 
   useEffect(() => {
     setPage(1);
   }, []);
 
+  useEffect(() => {
+    if (
+      Object.values(filter).some((value) => value !== "") &&
+      auctionData.length < 40
+    ) {
+      setLoading(true);
+      appendAuctionItemList();
+    }
+  }, [auctionData]);
+
   const handleAuctionSearch = async () => {
+    setPage(1);
     setLoading(true);
     try {
+      if (params.auction_item_category == "" && params.item_name == "") {
+        throw new Error(
+          "검색할 카테고리 카테고리를 선택하거나 아이템 이름을 입력해주세요!"
+        );
+      }
+      let filterArr: Item[] = [];
       const response: IAuctionResponse = await NEXON_API.getAuctionSearch(
         params
       );
       setParams({ ...params, cursor: response.next_cursor });
-      setAuctionData(response.auction_item);
+      filterArr = filterItems(response.auction_item, filter);
+      setAuctionData(filterArr);
       auctionItemListPagenator();
     } catch (error: any) {
       if (error?.status == 400) {
@@ -70,24 +101,33 @@ const Auction = () => {
           title: "검색 실패",
           description: "경매장에서 아이템 목록을 불러오는데 실패하였습니다.",
         });
+      } else {
+        toaster.create({
+          type: "error",
+          title: "검색 실패",
+          description: error.message,
+        });
       }
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   };
 
   const appendAuctionItemList = async () => {
     setLoading(true);
     try {
+      let filterArr: Item[] = [];
       if (params?.cursor === null) {
         return false;
       }
-
       const response: IAuctionResponse = await NEXON_API.getAuctionSearch(
         params
       );
+      filterArr = filterItems(response.auction_item, filter);
       setParams({ ...params, cursor: response.next_cursor });
-      setAuctionData(auctionData?.concat(response.auction_item));
+      setAuctionData(auctionData?.concat(filterArr));
       auctionItemListPagenator();
     } catch (error: any) {
       if (error?.status == 400) {
@@ -98,12 +138,100 @@ const Auction = () => {
         });
       }
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
   };
 
+  const filterItems = (
+    items: Item[],
+    filter: {
+      ergue: string;
+      ergueMin: string;
+      ergueMax: string;
+      rank: string;
+      option: string;
+      inchantHead: string;
+      inchantTail: string;
+    }
+  ) => {
+    return items.filter((item) => {
+      // 각 조건이 모두 참이어야 항목이 포함됨
+      const ergueMatch = filter.ergue
+        ? item.item_option.some(
+            (option) =>
+              option.option_type === "에르그" &&
+              option.option_sub_type === filter.ergue
+          )
+        : true;
+
+      const ergueLevelMatch =
+        filter.ergueMin || filter.ergueMax
+          ? item.item_option.some((option) => {
+              const optionValue = Number(option.option_value);
+              return (
+                option.option_type === "에르그" &&
+                (filter.ergueMin === undefined ||
+                  optionValue >= Number(filter.ergueMin)) &&
+                (filter.ergueMax === undefined ||
+                  optionValue <= Number(filter.ergueMax))
+              );
+            })
+          : true;
+
+      const rankMatch = filter.rank
+        ? item.item_option.some(
+            (option) =>
+              option.option_type === "세공 랭크" &&
+              option.option_value === filter.rank
+          )
+        : true;
+
+      const optionMatch = filter.option
+        ? item.item_option.some(
+            (option) =>
+              option.option_type === "세공 옵션" &&
+              option.option_value?.includes(filter.option)
+          )
+        : true;
+
+      const inchantHead = filter.inchantHead
+        ? item.item_option.some(
+            (option) =>
+              option.option_type === "인챈트" &&
+              option.option_sub_type === "접두" &&
+              option.option_value?.includes(filter.inchantHead)
+          )
+        : true;
+
+      const inchantTail = filter.inchantTail
+        ? item.item_option.some(
+            (option) =>
+              option.option_type === "인챈트" &&
+              option.option_sub_type === "접미" &&
+              option.option_value?.includes(filter.inchantTail)
+          )
+        : true;
+
+      // 모든 필터가 존재하면 true를 반환
+      return (
+        ergueMatch &&
+        ergueLevelMatch &&
+        rankMatch &&
+        optionMatch &&
+        inchantHead &&
+        inchantTail
+      );
+    });
+  };
+
   useEffect(() => {
+    setLoading(true);
     auctionItemListPagenator();
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
   }, [page, auctionData]);
 
   const auctionItemListPagenator = () => {
@@ -148,6 +276,14 @@ const Auction = () => {
     window.location.reload();
   };
 
+  const handleFilterChange = (e: any) => {
+    const { name, value } = e.target;
+    setFilter({
+      ...filter,
+      [name]: value,
+    });
+  };
+
   return (
     <Flex
       padding={{ smDown: 2, smToXl: 6 }}
@@ -163,11 +299,19 @@ const Auction = () => {
       <Caution />
       <Flex direction="column" gap={4} width="100%">
         <Alert
-          status="info"
+          status="warning"
           borderRadius={8}
           title={`카테고리와 검색어 중 우선 적용된 사항 한 가지만 검색에 적용됩니다. 다른 조건으로 검색하려면 초기화 후 검색을 진행해주세요!`}
-          fontSize={{ smDown: 'xs', sm: 'sm' }}
-        />
+          fontSize={{ smDown: "xs", sm: "sm" }}
+        >
+          <Text>
+            - 세공 옵션과, 인챈트는 키워드로 입력하시면 해당 키워드를 기준으로
+            필터링 됩니다.
+          </Text>
+          <Text>
+            - Ex) "다운어택" 검색시 다운어택 거리, 데미지 모두 필터링 됩니다.
+          </Text>
+        </Alert>
         <Card.Root>
           <CardBody borderWidth={1} borderRadius={8}>
             <Flex flexDirection="column" gap={4}>
@@ -178,9 +322,12 @@ const Auction = () => {
                   </Text>
                 </Box>
                 {params?.auction_item_category && (
-                  <Badge variant="subtle" colorPalette="green" fontSize={14}>
-                    {params.auction_item_category}
-                  </Badge>
+                  <>
+                    <Text>현재 카테고리:</Text>
+                    <Badge variant="subtle" colorPalette="green" fontSize={14}>
+                      {params.auction_item_category}
+                    </Badge>
+                  </>
                 )}
               </Flex>
               <Box flex={1}>
@@ -195,16 +342,18 @@ const Auction = () => {
               <Flex gap={4} justifyContent="flex-end">
                 <Button
                   width={150}
-                  colorScheme="green"
-                  size={{ smDown: 'xs', sm: 'sm' }}
+                  colorPalette="green"
+                  size={{ smDown: "xs", sm: "sm" }}
+                  disabled={loading}
                   onClick={() => handleAuctionSearch()}
                 >
-                  검색
+                  {loading ? <Spinner /> : "검색"}
                 </Button>
                 <Button
                   width={100}
-                  colorScheme="gray"
-                  size={{ smDown: 'xs', sm: 'sm' }}
+                  colorPalette="gray"
+                  size={{ smDown: "xs", sm: "sm" }}
+                  disabled={loading}
                   onClick={() => handleReset()}
                 >
                   초기화
@@ -213,38 +362,7 @@ const Auction = () => {
             </Flex>
           </CardBody>
         </Card.Root>
-        <Card.Root>
-          <CardBody borderWidth={1} borderRadius={8}>
-            <Flex justifyContent="space-between" alignItems="center" gap={4}>
-              <Checkbox checked={optionFlag} onChange={handleOptionFlag}>
-                아이템 옵션 같이보기
-              </Checkbox>
-            </Flex>
-            {/* <Flex gap={4} marginTop={4}>
-              <NativeSelectRoot>
-                <NativeSelectField placeholder="에르그" name="ergue">
-                  <option value="">전체</option>
-                  <option value="B">B</option>
-                  <option value="A">A</option>
-                  <option value="S">S</option>
-                </NativeSelectField>
-              </NativeSelectRoot>
-              <NativeSelectRoot>
-                <NativeSelectField placeholder="세공 랭크" name="rank">
-                  <option value="">전체</option>
-                  <option value="3">3</option>
-                  <option value="2">2</option>
-                  <option value="1">1</option>
-                </NativeSelectField>
-              </NativeSelectRoot>
-              <Field.Root orientation="horizontal">
-                <Field.Label>세공 옵션</Field.Label>
-                <Input placeholder="세공 옵션" flex="1" />
-              </Field.Root>
-            </Flex> */}
-          </CardBody>
-        </Card.Root>
-        <Box display={{ lg: 'none' }}>
+        <Box display={{ lg: "none" }}>
           <DrawerRoot placement="start">
             <DrawerBackdrop />
             <DrawerTrigger asChild>
@@ -268,8 +386,72 @@ const Auction = () => {
             </DrawerContent>
           </DrawerRoot>
         </Box>
+        <Card.Root>
+          <CardBody borderWidth={1} borderRadius={8}>
+            <Flex justifyContent="space-between" alignItems="center" gap={4}>
+              <Checkbox checked={optionFlag} onChange={handleOptionFlag}>
+                아이템 옵션 같이보기
+              </Checkbox>
+            </Flex>
+            <Flex gap={4} marginTop={4} flexDirection={{ smDown: 'column' }}>
+              <Field.Root flex={1}>
+                <Field.Label>에르그</Field.Label>
+                <NativeSelectRoot onChange={handleFilterChange}>
+                  <NativeSelectField placeholder="등급" name="ergue">
+                    <option value="">전체</option>
+                    <option value="B">B</option>
+                    <option value="A">A</option>
+                    <option value="S">S</option>
+                  </NativeSelectField>
+                </NativeSelectRoot>
+                <Flex alignItems="center" gap={4}>
+                  <Input
+                    placeholder="최소"
+                    name="ergueMin"
+                    onChange={handleFilterChange}
+                  />
+                  <Text>~</Text>
+                  <Input
+                    placeholder="최대"
+                    name="ergueMax"
+                    onChange={handleFilterChange}
+                  />
+                </Flex>
+              </Field.Root>
+              <Field.Root flex={1}>
+                <Field.Label>세공</Field.Label>
+                <NativeSelectRoot onChange={handleFilterChange}>
+                  <NativeSelectField placeholder="랭크" name="rank">
+                    <option value="">전체</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="1">1</option>
+                  </NativeSelectField>
+                </NativeSelectRoot>
+                <Input
+                  placeholder="옵션"
+                  name="option"
+                  onChange={handleFilterChange}
+                />
+              </Field.Root>
+              <Field.Root flex={1}>
+                <Field.Label>인챈트</Field.Label>
+                <Input
+                  placeholder="접두"
+                  name="inchantHead"
+                  onChange={handleFilterChange}
+                />
+                <Input
+                  placeholder="접미"
+                  name="inchantTail"
+                  onChange={handleFilterChange}
+                />
+              </Field.Root>
+            </Flex>
+          </CardBody>
+        </Card.Root>
         <Flex gap={4}>
-          <Card.Root flex={1} minW={200} display={{ lgDown: 'none' }}>
+          <Card.Root flex={1} minW={200} display={{ lgDown: "none" }}>
             <CardBody borderWidth={1}>
               <AuctionCategory onSelectItem={handleSelectCategory} />
             </CardBody>

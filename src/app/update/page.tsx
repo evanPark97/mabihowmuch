@@ -38,6 +38,29 @@ const Update = () => {
           </Text>
           <TimelineRoot variant="outline">
             <TimelineItem>
+              <TimelineTitle whiteSpace="nowrap">2024.11.11</TimelineTitle>
+              <TimelineContent textStyle="xs">
+                <TimelineTitle>
+                  <Badge>Beta 1.3</Badge>
+                  누락 옵션, 경매장 검색 필터링 기능 추가
+                </TimelineTitle>
+                - 검색된 내용을 필터링 기준으로 제외하는 형태로 구성되어 일부 버그가 발생 할 수 있습니다. 버그 발생시 알려주시면 빠르게 수정하도록 하겠습니다
+                - 숙련도, 피어싱 항목 추가
+              </TimelineContent>
+            </TimelineItem>
+
+            <TimelineItem>
+              <TimelineTitle whiteSpace="nowrap">2024.11.08</TimelineTitle>
+              <TimelineContent textStyle="xs">
+                <TimelineTitle>
+                  <Badge>Beta 1.2</Badge>
+                  NPC 상점 조회 추가
+                </TimelineTitle>
+                - 일부 UI 최적화
+              </TimelineContent>
+            </TimelineItem>
+
+            <TimelineItem>
               <TimelineTitle whiteSpace="nowrap">2024.11.01</TimelineTitle>
               <TimelineContent textStyle="xs">
                 <TimelineTitle>

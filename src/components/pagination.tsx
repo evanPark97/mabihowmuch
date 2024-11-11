@@ -1,3 +1,4 @@
+import { scrollTop } from "@/utils/common";
 import { Flex, Box, Button, IconButton } from "@chakra-ui/react";
 import React from "react";
 import { HiArrowLeft, HiArrowRight } from "react-icons/hi";
@@ -16,6 +17,7 @@ const Pagination: React.FC<PaginationProps> = ({
   const handlePageChange = (newPage: number) => {
     if (newPage > 0 && newPage <= totalPages) {
       onPageChange(newPage);
+      scrollTop();
     }
   };
 
@@ -35,7 +37,7 @@ const Pagination: React.FC<PaginationProps> = ({
       <IconButton
         aria-label="Previous page"
         variant="outline"
-        colorScheme="green"
+        colorPalette="green"
         size={{ smDown: 'xs', sm: 'sm' }}
         onClick={() => handlePageChange(page - 1)}
         disabled={page === 1}
@@ -47,7 +49,7 @@ const Pagination: React.FC<PaginationProps> = ({
         <Button
           key={pageNumber}
           variant={page === pageNumber ? "solid" : "outline"}
-          colorScheme="green"
+          colorPalette="green"
           size={{ smDown: 'xs', sm: 'sm' }}
           onClick={() => handlePageChange(pageNumber)}
         >
@@ -58,7 +60,7 @@ const Pagination: React.FC<PaginationProps> = ({
       <IconButton
         aria-label="Next page"
         variant="outline"
-        colorScheme="green"
+        colorPalette="green"
         size={{ smDown: 'xs', sm: 'sm' }}
         onClick={() => handlePageChange(page + 1)}
         disabled={page === 1}

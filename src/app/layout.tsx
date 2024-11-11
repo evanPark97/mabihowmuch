@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Flex } from "@chakra-ui/react";
+import { Box, Flex } from "@chakra-ui/react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import Provider from "./provider";
@@ -18,10 +18,14 @@ export default function RootLayout({
   return (
     <html lang="kr" suppressHydrationWarning>
       <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
         <script
+          type="text/javascript"
+          src="//t1.daumcdn.net/kas/static/ba.min.js"
           async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8613704714656621"
-          crossOrigin="anonymous"
         ></script>
       </head>
       <body>
@@ -36,7 +40,27 @@ export default function RootLayout({
             overflowX="hidden"
           >
             <Header />
-            {children}
+            <Box display={{ smDown: "none" }}>
+              <ins
+                className="kakao_ad_area"
+                style={{ display: "none" }}
+                data-ad-unit="DAN-1mWBnwJylVOc65dJ"
+                data-ad-width="728"
+                data-ad-height="90"
+              ></ins>
+            </Box>
+            <Box display={{ md: "none" }}>
+              <ins
+                className="kakao_ad_area"
+                style={{ display: "none" }}
+                data-ad-unit="DAN-FC10E5ShhUx5NP6X"
+                data-ad-width="320"
+                data-ad-height="100"
+              ></ins>
+            </Box>
+            <Box paddingY={4} paddingX={2} flex={1}>
+              {children}
+            </Box>
             <Footer />
           </Flex>
         </Provider>

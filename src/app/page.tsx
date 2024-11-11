@@ -14,6 +14,7 @@ export default function Home() {
       alignItems="center"
       flex={1}
     >
+      
       <Text fontSize={24} fontWeight={600} textAlign="center" letterSpacing={6}>
         지금얼맙?
       </Text>
@@ -22,13 +23,10 @@ export default function Home() {
           <Caution />
           <Box marginTop={6}>
             <Flex direction="column" gap={4}>
-              <Button colorScheme="green" onClick={() => route.push("auction")}>
+              <Button colorPalette="green" onClick={() => route.push("auction")}>
                 경매장 검색
               </Button>
-              <Button
-                colorScheme="green"
-                onClick={() => alert("페이지 준비중입니다!")}
-              >
+              <Button colorPalette="green" onClick={() => route.push("store")}>
                 NPC 상점 검색
               </Button>
             </Flex>

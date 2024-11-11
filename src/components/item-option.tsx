@@ -1,5 +1,5 @@
 import { ItemOption as IAuctionItemOption } from "@/interface/auction-list";
-import { Flex, Box, Text, Separator } from "@chakra-ui/react";
+import { Flex, Box, Text } from "@chakra-ui/react";
 import { v4 as uuidv4 } from "uuid";
 
 const OptionValueRenderer = (option: IAuctionItemOption) => {
@@ -13,6 +13,19 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
         return "pink.500";
       default:
         return "";
+    }
+  };
+
+  const convertPiercing = (piercing: number) => {
+    switch (piercing) {
+      case 1:
+        return "(마법)방어 6, (마법)보호 5 차감";
+      case 2:
+        return "(마법)방어 12, (마법)보호 10 차감";
+      default:
+        return `(마법)방어 ${Number(piercing) * 10 - 10}, (마법)보호 ${
+          Number(piercing) * 5
+        }`;
     }
   };
 
@@ -174,6 +187,28 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
         </Flex>
       );
 
+    case "숙련":
+      return (
+        <Flex gap={2} key={uuidv4()}>
+          <Text>{option.option_value}%ㅛㅁ구 ㅇㄷㅍ</Text>
+        </Flex>
+      );
+
+    case "피어싱 레벨":
+      return (
+        <Flex gap={2} key={uuidv4()}>
+          <Text>
+            {option.option_value}({option.option_value2})
+          </Text>
+          <Text>
+            {convertPiercing(
+              Number(option.option_value) + Number(option.option_value2?.split('+')[1])
+            )}{" "}
+            차감
+          </Text>
+        </Flex>
+      );
+
     default:
       break;
   }
@@ -182,8 +217,11 @@ const OptionValueRenderer = (option: IAuctionItemOption) => {
 export const OptionRenderer = ({
   itemOption,
 }: {
-  itemOption: { [key: string]: IAuctionItemOption[] };
+  itemOption: { [key: string]: IAuctionItemOption[] } | undefined;
 }) => {
+  console.log(itemOption);
+  if (!itemOption) return null;
+
   const handleItemOption = () => {
     let layoutMap: {
       [key: string]: JSX.Element | null;
@@ -375,6 +413,26 @@ export const OptionRenderer = ({
             </Flex>
           );
           break;
+        case "숙련":
+          layoutMap.proficiency = (
+            <Flex gap={2} key="proficiency">
+              <Text fontSize={{ mdDown: "sm", md: "md" }} fontWeight={600}>
+                숙련도
+              </Text>
+              <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
+            </Flex>
+          );
+          break;
+        case "피어싱 레벨":
+          layoutMap.piercing = (
+            <Flex gap={2} key="piercing">
+              <Text fontSize={{ mdDown: "sm", md: "md" }} fontWeight={600}>
+                피어싱
+              </Text>
+              <Box>{option.map((_option) => OptionValueRenderer(_option))}</Box>
+            </Flex>
+          );
+          break;
 
         default:
           break;
@@ -382,45 +440,60 @@ export const OptionRenderer = ({
     }
 
     return (
-      <Box flex={1}>
-        <Separator />
-        <Box marginTop={4}>{layoutMap.inchant}</Box>
+      <Box flex={1} fontSize={{ mdDown: "xs", md: "sm" }}>
+        <Box marginTop={2}>{layoutMap.inchant}</Box>
         <Flex
           gap={4}
           justifyContent="space-between"
           alignItems="flex-start"
-          marginTop={2}
-          fontSize={{ mdDown: "xs", md: "sm" }}
           flexDirection={{ mdDown: "column", md: "row" }}
         >
-          <Box>
+          {(layoutMap.attack ||
+            layoutMap.durability ||
+            layoutMap.balance ||
+            layoutMap.critical ||
+            layoutMap.piercing) && (
             <Box>
-              {layoutMap.attack}
-              {layoutMap.durability}
-              {layoutMap.balance}
-              {layoutMap.critical}
+              <Box>
+                {layoutMap.attack}
+                {layoutMap.durability}
+                {layoutMap.proficiency}
+                {layoutMap.balance}
+                {layoutMap.critical}
+              </Box>
+              <Box>
+                {layoutMap.special}
+                {layoutMap.gem}
+                {layoutMap.alteration}
+                {layoutMap.belonging}
+                {layoutMap.piercing}
+              </Box>
             </Box>
+          )}
+          {(layoutMap.ergue ||
+            layoutMap.rank ||
+            layoutMap.options ||
+            layoutMap.set ||
+            layoutMap.totemEffect) && (
             <Box>
-              {layoutMap.special}
-              {layoutMap.gem}
-              {layoutMap.alteration}
-              {layoutMap.belonging}
+              <Box>{layoutMap.ergue}</Box>
+              <Box>
+                {layoutMap.rank}
+                {layoutMap.options}
+              </Box>
+              <Box>{layoutMap.set}</Box>
+              <Box>{layoutMap.totemEffect}</Box>
             </Box>
-          </Box>
-          <Box>
-            <Box>{layoutMap.ergue}</Box>
+          )}
+          {(layoutMap.totemOption ||
+            layoutMap.totemLimit ||
+            layoutMap.color) && (
             <Box>
-              {layoutMap.rank}
-              {layoutMap.options}
+              <Box>{layoutMap.totemOption}</Box>
+              <Box>{layoutMap.totemLimit}</Box>
+              <Box>{layoutMap.color}</Box>
             </Box>
-            <Box>{layoutMap.set}</Box>
-            <Box>{layoutMap.totemEffect}</Box>
-          </Box>
-          <Box>
-            <Box>{layoutMap.totemOption}</Box>
-            <Box>{layoutMap.totemLimit}</Box>
-            <Box>{layoutMap.color}</Box>
-          </Box>
+          )}
         </Flex>
       </Box>
     );

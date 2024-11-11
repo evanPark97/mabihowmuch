@@ -19,15 +19,29 @@ const Header = () => {
               textDecoration: "underline",
             }}
           >
-            {path !== "/" && "지금 얼맙? (Beta 1.1)"}
+            {path !== "/" && `지금 얼맙? ${process.env.NEXT_PUBLIC_VERSION}`}
           </Text>
         </Link>
         <Flex gap={2}>
+          <Button
+            variant={path === "/auction" ? "solid" : "outline"}
+            size={{ smDown: "xs", sm: "md" }}
+            onClick={() => route.push("/auction")}
+          >
+            경매장 검색
+          </Button>
+          <Button
+            variant={path === "/store" ? "solid" : "outline"}
+            size={{ smDown: "xs", sm: "md" }}
+            onClick={() => route.push("/store")}
+          >
+            NPC 상점 검색
+          </Button>
           {path !== "/update" ? (
             <Button
               variant="outline"
-              colorScheme="green"
-              size={{ smDown: 'xs', sm: 'md' }}
+              colorPalette="green"
+              size={{ smDown: "xs", sm: "md" }}
               onClick={() => route.push("/update")}
             >
               업데이트 노트
@@ -35,11 +49,11 @@ const Header = () => {
           ) : (
             <Button
               variant="outline"
-              colorScheme="green"
-              size={{ smDown: 'xs', sm: 'md' }}
-              onClick={() => route.push("/auction")}
+              colorPalette="green"
+              size={{ smDown: "xs", sm: "md" }}
+              onClick={() => route.back()}
             >
-              경매장 검색
+              돌아가기
             </Button>
           )}
           <ColorModeToggle />
