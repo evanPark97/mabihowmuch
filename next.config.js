@@ -1,3 +1,7 @@
+const prefix =
+  process.env.NODE_ENV === "production" ? "https://mabihowmuch.site/" : "";
+
 const nextConfig = {
-  output: 'export',
-}
+  output: "export",
+  assetPrefix: prefix,
+};
