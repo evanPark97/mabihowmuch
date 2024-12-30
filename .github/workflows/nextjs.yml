@@ -62,10 +62,14 @@ jobs:
 
       - name: Generate Environment Variables File for Production
         run: |
-          echo "NEXT_PUBLIC_API_KEY=${{ secrets.API_KEY }}" >> .env.production
-          echo "NEXT_PUBLIC_API_URL=${{ secrets.API_URL }}" >> .env.production
-          echo "NEXT_PUBLIC_VERSION=${{ secrets.VERSION }}" >> .env.production
-
+          echo "NEXT_PUBLIC_API_KEY=$NEXT_PUBLIC_API_KEY" >> .env.production
+          echo "NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL" >> .env.production
+          echo "NEXT_PUBLIC_VERSION=$NEXT_PUBLIC_VERSION" >> .env.production
+        env:
+          NEXT_PUBLIC_API_KEY: ${{ secrets.API_KEY }}
+          NEXT_PUBLIC_API_URL: ${{ secrets.API_URL }}
+          NEXT_PUBLIC_VERSION: ${{ secrets.VERSION }}
+        
       - name: Build with Next.js
         run: ${{ steps.detect-package-manager.outputs.runner }} next build
 
