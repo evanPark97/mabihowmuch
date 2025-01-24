@@ -1,9 +1,8 @@
 "use client";
 import Caution from "@/components/caution";
 import { ShopItem } from "@/components/item";
-import { OptionRenderer } from "@/components/item-option";
+import Ad from "@/components/kakao-ad";
 import { Checkbox } from "@/components/ui/checkbox";
-import { NumberInputField } from "@/components/ui/number-input";
 import { toaster, Toaster } from "@/components/ui/toaster";
 import {
   INpcShopParams,
@@ -11,7 +10,7 @@ import {
   INpcShopResponse,
 } from "@/interface/ncp-shop";
 import { useOptionFlagStore } from "@/stores/useOptionFlagStore";
-import { NPC_NAME, SERVER_NAME } from "@/utils/constant";
+import { kakaoAdUnit, NPC_NAME, SERVER_NAME } from "@/utils/constant";
 import NexonAPI from "@/utils/nexon-api";
 import {
   Box,
@@ -29,7 +28,6 @@ import {
   Flex,
   NativeSelectField,
   NativeSelectRoot,
-  NumberInputRoot,
   Tabs,
   Text,
 } from "@chakra-ui/react";
@@ -75,7 +73,8 @@ const Store = () => {
         toaster.create({
           type: "error",
           title: "검색 실패",
-          description: "아이템 목록을 불러오는데 실패하였습니다. 서버 또는 채널을 변경 후 다시 조회해주세요.",
+          description:
+            "아이템 목록을 불러오는데 실패하였습니다. 서버 또는 채널을 변경 후 다시 조회해주세요.",
         });
       } else {
         toaster.create({
@@ -102,163 +101,173 @@ const Store = () => {
   };
 
   return (
-    <Flex
-      padding={{ smDown: 2, smToXl: 6 }}
-      direction="column"
-      gap={4}
-      justifyContent="center"
-      alignItems="center"
-      width="100vw"
-      maxW={960}
-      flex={1}
-    >
-      <Toaster />
-      <Caution />
-      <DialogRoot
-        lazyMount
-        open={openDialog}
-        size={{ mdDown: "md", md: "lg" }}
-        motionPreset="slide-in-bottom"
-        scrollBehavior="inside"
+    <>
+      <Ad
+        desktopAdUnit={kakaoAdUnit.pc}
+        mobileAdUnit={kakaoAdUnit.mobile}
+        adWidthDesktop="728"
+        adHeightDesktop="90"
+        adWidthMobile="320"
+        adHeightMobile="100"
+      />
+      <Flex
+        padding={{ smDown: 2, smToXl: 6 }}
+        direction="column"
+        gap={4}
+        justifyContent="center"
+        alignItems="center"
+        width="100vw"
+        maxW={960}
+        flex={1}
       >
-        <DialogContent
-          position="fixed"
-          zIndex={100}
-          width="90%"
-          left={{ smDown: 0, smToMd: 0 }}
-          right={{ smDown: 0, smToMd: 0 }}
-          top={{ mdDown: 0, md: 0 }}
-          bottom={{ mdDown: 0, md: 0 }}
-          padding={1}
+        <Toaster />
+        <Caution />
+        <DialogRoot
+          lazyMount
+          open={openDialog}
+          size={{ mdDown: "md", md: "lg" }}
+          motionPreset="slide-in-bottom"
+          scrollBehavior="inside"
         >
-          <DialogHeader>
-            <DialogTitle>
-              채널 선택 (현재 채널 {params.channel} 채널)
-            </DialogTitle>
-          </DialogHeader>
-          <DialogBody>
-            <Flex flexDirection="column" gap={4}>
-              {Array.from({ length: 15 }, (_, i) => (
-                <Button
-                  key={i + 1}
-                  colorPalette={params.channel === i + 1 ? "blue" : "gray"}
-                  onClick={() => {
-                    setParams({ ...params, channel: i + 1 });
-                    setOpenDialog(false);
-                  }}
-                >
-                  {i + 1} 채널
-                </Button>
-              ))}
-            </Flex>
-          </DialogBody>
-          <DialogFooter>
-            <DialogActionTrigger asChild>
-              <Button variant="solid" onClick={() => setOpenDialog(false)}>
-                닫기
-              </Button>
-            </DialogActionTrigger>
-          </DialogFooter>
-          <DialogCloseTrigger />
-        </DialogContent>
-      </DialogRoot>
-      <Flex direction="column" gap={4} width="100%">
-        <Box flex={1}>
-          <Card.Root>
-            <CardBody>
-              <Text marginBottom={4} fontSize={20} fontWeight={600}>
-                NPC 상점 검색
-              </Text>
-              <Flex direction="column" gap={4}>
-                <NativeSelectRoot>
-                  <NativeSelectField
-                    placeholder="서버"
-                    name="server_name"
-                    onChange={handleInputChange}
+          <DialogContent
+            position="fixed"
+            zIndex={100}
+            width="90%"
+            left={{ smDown: 0, smToMd: 0 }}
+            right={{ smDown: 0, smToMd: 0 }}
+            top={{ mdDown: 0, md: 0 }}
+            bottom={{ mdDown: 0, md: 0 }}
+            padding={1}
+          >
+            <DialogHeader>
+              <DialogTitle>
+                채널 선택 (현재 채널 {params.channel} 채널)
+              </DialogTitle>
+            </DialogHeader>
+            <DialogBody>
+              <Flex flexDirection="column" gap={4}>
+                {Array.from({ length: 15 }, (_, i) => (
+                  <Button
+                    key={i + 1}
+                    colorPalette={params.channel === i + 1 ? "blue" : "gray"}
+                    onClick={() => {
+                      setParams({ ...params, channel: i + 1 });
+                      setOpenDialog(false);
+                    }}
                   >
-                    {SERVER_NAME.map((server, index) => (
-                      <option key={index} value={server}>
-                        {server}
-                      </option>
-                    ))}
-                  </NativeSelectField>
-                </NativeSelectRoot>
-                <NativeSelectRoot>
-                  <NativeSelectField
-                    placeholder="NPC"
-                    name="npc_name"
-                    onChange={handleInputChange}
-                  >
-                    {NPC_NAME.map((npc, index) => (
-                      <option key={index} value={npc}>
-                        {npc}
-                      </option>
-                    ))}
-                  </NativeSelectField>
-                </NativeSelectRoot>
-                <Box>
-                  <Button onClick={() => setOpenDialog(true)}>
-                    채널 선택 (현재 채널: {params.channel})
+                    {i + 1} 채널
                   </Button>
-                </Box>
-                <Flex
-                  justifyContent="space-between"
-                  alignItems="center"
-                  gap={4}
-                >
-                  <Checkbox checked={optionFlag} onChange={handleOptionFlag}>
-                    아이템 옵션 같이보기
-                  </Checkbox>
-                </Flex>
-                <Button
-                  colorPalette="green"
-                  onClick={() => handleNpcShopList()}
-                >
-                  검색
-                </Button>
+                ))}
               </Flex>
-            </CardBody>
-          </Card.Root>
-        </Box>
-        <Box>
-          {shopData && (
+            </DialogBody>
+            <DialogFooter>
+              <DialogActionTrigger asChild>
+                <Button variant="solid" onClick={() => setOpenDialog(false)}>
+                  닫기
+                </Button>
+              </DialogActionTrigger>
+            </DialogFooter>
+            <DialogCloseTrigger />
+          </DialogContent>
+        </DialogRoot>
+        <Flex direction="column" gap={4} width="100%">
+          <Box flex={1}>
             <Card.Root>
               <CardBody>
+                <Text marginBottom={4} fontSize={20} fontWeight={600}>
+                  NPC 상점 검색
+                </Text>
                 <Flex direction="column" gap={4}>
-                  <Tabs.Root
-                    variant="subtle"
-                    value={defaultTab}
-                    onValueChange={(e) => setDefaultTab(e.value)}
+                  <NativeSelectRoot>
+                    <NativeSelectField
+                      placeholder="서버"
+                      name="server_name"
+                      onChange={handleInputChange}
+                    >
+                      {SERVER_NAME.map((server, index) => (
+                        <option key={index} value={server}>
+                          {server}
+                        </option>
+                      ))}
+                    </NativeSelectField>
+                  </NativeSelectRoot>
+                  <NativeSelectRoot>
+                    <NativeSelectField
+                      placeholder="NPC"
+                      name="npc_name"
+                      onChange={handleInputChange}
+                    >
+                      {NPC_NAME.map((npc, index) => (
+                        <option key={index} value={npc}>
+                          {npc}
+                        </option>
+                      ))}
+                    </NativeSelectField>
+                  </NativeSelectRoot>
+                  <Box>
+                    <Button onClick={() => setOpenDialog(true)}>
+                      채널 선택 (현재 채널: {params.channel})
+                    </Button>
+                  </Box>
+                  <Flex
+                    justifyContent="space-between"
+                    alignItems="center"
+                    gap={4}
                   >
-                    {shopData.shop.map((tab, index) => (
-                      <Tabs.List>
-                        <Tabs.Trigger value={tab.tab_name}>
-                          {tab.tab_name}
-                        </Tabs.Trigger>
-                      </Tabs.List>
-                    ))}
-                    {shopData.shop.map((tab, index) => (
-                      <Tabs.Content value={tab.tab_name}>
-                        <Flex gap={4} flexDirection="column">
-                          {tab.item &&
-                            tab.item.map((item, index) => (
-                              <ShopItem
-                                key={index}
-                                item={item}
-                                loading={loading}
-                              />
-                            ))}
-                        </Flex>
-                      </Tabs.Content>
-                    ))}
-                  </Tabs.Root>
+                    <Checkbox checked={optionFlag} onChange={handleOptionFlag}>
+                      아이템 옵션 같이보기
+                    </Checkbox>
+                  </Flex>
+                  <Button
+                    colorPalette="green"
+                    onClick={() => handleNpcShopList()}
+                  >
+                    검색
+                  </Button>
                 </Flex>
               </CardBody>
             </Card.Root>
-          )}
-        </Box>
+          </Box>
+          <Box>
+            {shopData && (
+              <Card.Root>
+                <CardBody>
+                  <Flex direction="column" gap={4}>
+                    <Tabs.Root
+                      variant="subtle"
+                      value={defaultTab}
+                      onValueChange={(e) => setDefaultTab(e.value)}
+                    >
+                      {shopData.shop.map((tab, index) => (
+                        <Tabs.List>
+                          <Tabs.Trigger value={tab.tab_name}>
+                            {tab.tab_name}
+                          </Tabs.Trigger>
+                        </Tabs.List>
+                      ))}
+                      {shopData.shop.map((tab, index) => (
+                        <Tabs.Content value={tab.tab_name}>
+                          <Flex gap={4} flexDirection="column">
+                            {tab.item &&
+                              tab.item.map((item, index) => (
+                                <ShopItem
+                                  key={index}
+                                  item={item}
+                                  loading={loading}
+                                />
+                              ))}
+                          </Flex>
+                        </Tabs.Content>
+                      ))}
+                    </Tabs.Root>
+                  </Flex>
+                </CardBody>
+              </Card.Root>
+            )}
+          </Box>
+        </Flex>
       </Flex>
-    </Flex>
+    </>
   );
 };
 

@@ -1,11 +1,8 @@
-/**
- * @type {import('next').NextConfig}
- */
-const prefix =
-  process.env.NODE_ENV === "production" ? "https://mabihowmuch.site/" : "";
+/** @type {import('next').NextConfig} */
 const nextConfig = {
+  // basePath: "/",
   output: "export",
-  assetPrefix: prefix,
+  reactStrictMode: true,
 };
 
 module.exports = nextConfig;

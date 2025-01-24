@@ -132,3 +132,8 @@ export const AUCTION_CATEGORY: AuctionCategoryType | any = {
     "기타",
   ],
 };
+
+export const kakaoAdUnit = {
+  mobile: "DAN-FC10E5ShhUx5NP6X",
+  pc: "DAN-1mWBnwJylVOc65dJ",
+};
