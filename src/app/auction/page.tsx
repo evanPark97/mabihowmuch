@@ -45,7 +45,9 @@ import Ad from "@/components/kakao-ad";
 const Auction = () => {
   const NEXON_API = new NexonAPI();
   const { optionFlag, toggleOptionFlag } = useOptionFlagStore();
-  const [params, setParams] = useState<IAuctionRequestParams>({});
+  const [params, setParams] = useState<IAuctionRequestParams>({
+    item_name: "",
+  });
 
   const [loading, setLoading] = useState(false);
   const [auctionData, setAuctionData] = useState<Item[]>([]);
